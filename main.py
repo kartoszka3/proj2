@@ -2,6 +2,22 @@ class GmlFeatureMember:
     def __init__(self, feature_type, feature_data):
         self.feature_type = feature_type
         self.feature_data = feature_data
+        self.geometry_type = None
+        self.geometry = None
+        self.classify_geometry()
+
+    def classify_geometry(self):
+        for line in self.feature_data:
+            if '<gml:Point' in line:
+                self.geometry_type = 'Point'
+                return
+            if '<gml:Polygon' in line:
+                self.geometry_type = 'Polygon'
+                return
+            if '<gml:Curve' in line or '<gml:LineString' in line:
+                self.geometry_type = 'LineString'
+                return
+
 
 class GmlReader:
     def __init__(self, path):
@@ -23,11 +39,5 @@ class GmlReader:
                                 feature_type = tag_name
                         feature_data.append(line)
                     self.members.append(GmlFeatureMember(feature_type, feature_data))
-    
-if __name__ == "__main__":
-    path = 'C:\\uni\\5sem\\kataster\\proj2\\dane\\Zbiór danych GML ZSK 2025.gml.txt'
 
-    reader = GmlReader(path)
-    print(reader.members[672].feature_type)
-
-
+#DZIAŁKI I UŻYTKI TYLKO
