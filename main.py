@@ -10,14 +10,24 @@ class GmlFeatureMember:
         for line in self.feature_data:
             if '<gml:Point' in line:
                 self.geometry_type = 'Point'
+                for l in self.feature_data:
+                    if '<gml:pos>' in l:
+                        self.geometry = l.strip()
+                        break
+            if '<gml:Curve' in line or '<gml:LineString' in line:
+                self.geometry_type = 'LineString'
+                for l in self.feature_data:
+                    if '<gml:posList>' in l:
+                        self.geometry = l.strip()
+                        break
                 return
             if '<gml:Polygon' in line:
                 self.geometry_type = 'Polygon'
+                for l in self.feature_data:
+                    if '<gml:posList>' in l:
+                        self.geometry = l.strip()
+                        break
                 return
-            if '<gml:Curve' in line or '<gml:LineString' in line:
-                self.geometry_type = 'LineString'
-                return
-
 
 class GmlReader:
     def __init__(self, path):
