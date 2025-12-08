@@ -40,7 +40,7 @@ class GmlFeatureMember:
                     end = line.find('</')
                     if start > 0 and end > start:
                         try:
-                            self.pole_ewidencyjne = float(line[start:end])
+                            self.area = float(line[start:end])
                         except:
                             pass
                 
@@ -75,8 +75,7 @@ class GmlFeatureMember:
                             current_klasouzytek['powierzchnia'] = 0.0
                 
                 if '</egb:klasouzytek>' in line and current_klasouzytek:
-                    # Dodaj kompletny klasoużytek do listy
-                    self.klasouzytki.append({
+                    self.classuse.append({
                         'OFU': current_klasouzytek.get('OFU', ''),
                         'OZU': current_klasouzytek.get('OZU', ''),
                         'OZK': current_klasouzytek.get('OZK', ''),

@@ -176,7 +176,26 @@ class GmlViewerApp:
         
         info = f"Typ obiektu:\n{member.feature_type}\n\n"
         info += f"Typ geometrii:\n{member.geometry_type}\n\n"
-        info += f"Kod obiektu:\n{member.gml_id}\n\n"
+        
+        if hasattr(member, 'gml_id') and member.gml_id:
+            info += f"ID obiektu:\n{member.gml_id}\n\n"
+        
+        if hasattr(member, 'area') and member.area:
+            info += f"Powierzchnia:\n{member.area} ha\n\n"
+        
+        if hasattr(member, 'classuse') and member.classuse:
+            info += "Klasyfikacja użytkowania:\n"
+            for i in member.classuse:
+                ofu = i.get('OFU', '')
+                ozu = i.get('OZU', '')
+                ozk = i.get('OZK', '')
+                pow = i.get('powierzchnia', 0)
+                if ofu == ozu:
+                    info += f" - {ofu}{ozk}: {pow} ha\n"
+                elif ofu and ozu and ozk:
+                    info += f" - {ofu}-{ozu}{ozk}: {pow} ha\n"
+                else:
+                    info += f" - {ofu}: {pow} ha\n"
 
         self.info_text.insert("1.0", info)
         self.info_text.config(state=tk.DISABLED)
