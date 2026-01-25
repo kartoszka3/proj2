@@ -7,6 +7,16 @@ class GmlFeatureMember:
         self.gml_id = None
         self.area = None
         self.classuse = []
+        self.parcel_id = None
+        self.point_id = None
+        self.contour_id = None
+        self.ozu = None
+        self.ozk = None
+        self.building_function = None
+        self.building_id = None
+        self.floors_above = None
+        self.floors_below = None
+        self.built_area = None
         self.classify()
 
     def classify(self):
@@ -19,8 +29,41 @@ class GmlFeatureMember:
                     start = line.find('gml:id="') + 8
                     end = line.find('"', start)
                     if start > 7 and end > start:
-                        self.gml_id = line[start:end]
-
+                            self.gml_id = line[start:end]
+                if '<egb:idBudynku>' in line:
+                    start = line.find('>') + 1
+                    end = line.find('</')
+                    if start > 0 and end > start:
+                        self.building_id = line[start:end]
+                if '<egb:rodzajWgKST>' in line:
+                    start = line.find('>') + 1
+                    end = line.find('</')
+                    if start > 0 and end > start:
+                        self.building_function = line[start:end]
+                if '<egb:liczbaKondygnacjiNadziemnych>' in line:
+                    start = line.find('>') + 1
+                    end = line.find('</')
+                    if start > 0 and end > start:
+                        try:
+                            self.floors_above = int(line[start:end])
+                        except:
+                            pass
+                if '<egb:liczbaKondygnacjiPodziemnych>' in line:
+                    start = line.find('>') + 1
+                    end = line.find('</')
+                    if start > 0 and end > start:
+                        try:
+                            self.floors_below = int(line[start:end])
+                        except:
+                            pass
+                if '<egb:powZabudowy' in line:
+                    start = line.find('>') + 1
+                    end = line.find('</')
+                    if start > 0 and end > start:
+                        try:
+                            self.built_area = float(line[start:end])
+                        except:
+                            pass
         if self.feature_type == "egb:EGB_DzialkaEwidencyjna":
             self.geometry_type = "Polygon"
             current_klasouzytek = {}
@@ -34,6 +77,12 @@ class GmlFeatureMember:
                     end = line.find('"', start)
                     if start > 7 and end > start:
                         self.gml_id = line[start:end]
+                
+                if '<egb:idDzialki>' in line:
+                    start = line.find('>') + 1
+                    end = line.find('</')
+                    if start > 0 and end > start:
+                        self.parcel_id = line[start:end]
                 
                 if '<egb:poleEwidencyjne' in line:
                     start = line.find('>') + 1
@@ -82,6 +131,54 @@ class GmlFeatureMember:
                         'powierzchnia': current_klasouzytek.get('powierzchnia', 0.0)
                     })
                     current_klasouzytek = {}
+                
+        if self.feature_type == "egb:EGB_PunktGraniczny":
+            self.geometry_type = "Point"
+            for line in self.feature_data:
+                if "gml:pos" in line:
+                    self.geometry = line[line.find('>') + 1:line.find('</')]
+                
+                if 'gml:id=' in line and self.gml_id is None:
+                    start = line.find('gml:id="') + 8
+                    end = line.find('"', start)
+                    if start > 7 and end > start:
+                        self.gml_id = line[start:end]
+                
+                if '<egb:idPunktu>' in line:
+                    start = line.find('>') + 1
+                    end = line.find('</')
+                    if start > 0 and end > start:
+                        self.point_id = line[start:end]
+        
+        if self.feature_type == "egb:EGB_KonturKlasyfikacyjny":
+            self.geometry_type = "Polygon"
+            for line in self.feature_data:
+                if "gml:posList" in line:
+                    self.geometry = line[line.find('>') + 1:line.find('</')]
+                
+                if 'gml:id=' in line and self.gml_id is None:
+                    start = line.find('gml:id="') + 8
+                    end = line.find('"', start)
+                    if start > 7 and end > start:
+                        self.gml_id = line[start:end]
+                
+                if '<egb:idKonturu>' in line:
+                    start = line.find('>') + 1
+                    end = line.find('</')
+                    if start > 0 and end > start:
+                        self.contour_id = line[start:end]
+                
+                if '<egb:OZU>' in line:
+                    start = line.find('>') + 1
+                    end = line.find('</')
+                    if start > 0 and end > start:
+                        self.ozu = line[start:end]
+                
+                if '<egb:OZK>' in line:
+                    start = line.find('>') + 1
+                    end = line.find('</')
+                    if start > 0 and end > start:
+                        self.ozk = line[start:end]
                 
 
 class GmlReader:
